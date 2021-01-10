@@ -14,13 +14,6 @@ app.post("/", (req, res, next) => {
   form.keepExtensions = true;
   form.uploadDir = uploadDir;
 
-  form.parse(req, (err, fields, files) => {
-    //get other fields
-    data = { ...data, ...fields };
-    if (err) return res.status(500).json({ error: err });
-    res.status(200).json({ uploaded: true, data });
-  });
-
   //   Target when a file begin to upload
   form.on("fileBegin", (name, file) => {
     const [fileName, fileExt] = file.name.split(".");
@@ -28,8 +21,14 @@ app.post("/", (req, res, next) => {
     data.file = newFileName;
     file.path = path.join(uploadDir, newFileName);
   });
-});
 
+  form.parse(req, (err, fields, files) => {
+    //get other fields
+    data = { ...data, ...fields };
+    if (err) return res.status(500).json({ error: err });
+    res.status(200).json({ uploaded: true, data });
+  });
+});
 const PORT = 6000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
